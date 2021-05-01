@@ -74,13 +74,13 @@ module Net   #:nodoc:
   #
   # === POST
   #
-  #   uri = URI('http://www.example.com/search.cgi')
+  #   uri = 'http://www.example.com/search.cgi'
   #   res = Net::HTTP.post_form(uri, 'q' => 'ruby', 'max' => '50')
   #   puts res.body
   #
   # === POST with Multiple Values
   #
-  #   uri = URI('http://www.example.com/search.cgi')
+  #   uri = 'http://www.example.com/search.cgi'
   #   res = Net::HTTP.post_form(uri, 'q' => ['ruby', 'perl'], 'max' => '50')
   #   puts res.body
   #
@@ -497,25 +497,26 @@ module Net   #:nodoc:
       end
     end
 
-    # Posts data to the specified URI object.
+    # Posts data to the specified URI.
     #
     # Example:
     #
     #   require 'net/http'
     #   require 'uri'
     #
-    #   Net::HTTP.post URI('http://www.example.com/api/search'),
+    #   Net::HTTP.post 'http://www.example.com/api/search',
     #                  { "q" => "ruby", "max" => "50" }.to_json,
     #                  "Content-Type" => "application/json"
     #
     def HTTP.post(url, data, header = nil)
+      url = URI(url) if url.is_a?(String)
       start(url.hostname, url.port,
             :use_ssl => url.scheme == 'https' ) {|http|
         http.post(url, data, header)
       }
     end
 
-    # Posts HTML form data to the specified URI object.
+    # Posts HTML form data to the specified URI.
     # The form data must be provided as a Hash mapping from String to String.
     # Example:
     #
@@ -529,10 +530,11 @@ module Net   #:nodoc:
     #
     #   require 'net/http'
     #
-    #   Net::HTTP.post_form URI('http://www.example.com/search.cgi'),
+    #   Net::HTTP.post_form 'http://www.example.com/search.cgi',
     #                       { "q" => "ruby", "max" => "50" }
     #
     def HTTP.post_form(url, params)
+      url = URI(url) if url.is_a?(String)
       req = Post.new(url)
       req.form_data = params
       req.basic_auth url.user, url.password if url.user
